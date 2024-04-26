@@ -3,6 +3,22 @@
 #include "../run_unweighted.h"
 #include <iostream>
 
+namespace {
+        template <class F, bool no_early_exit_, class W> struct F2 {
+                F f;
+                F2(F f_) : f(f_) {}
+                W empty_weight = W();
+                auto operator()(auto src, auto dest) { return f(src, dest, empty_weight); }
+                static constexpr bool no_early_exit = no_early_exit_;
+        };
+        template <class F, class W> struct F3 {
+                F f;
+                size_t src;
+                F3(F f_, size_t src_) : f(f_), src(src_) {}
+                W empty_weight = W();
+                auto operator()(const auto &dest) const{ return f(src, dest, empty_weight); }
+        };
+};
 template <template <class W> class vertex_type, class W>
 struct TerraceWrapper{
   using vertex = vertex_type<W>;
@@ -20,21 +36,21 @@ struct TerraceWrapper{
 
   template <class F> void map_neighbors(size_t i, F f) const {
     W empty_weight = W();
-    graph.map_neighbors(i,f,empty_weight);
+    graph.map_neighbors(i,f,F2<F, true, W>(f),F3<F,W>(f,i),empty_weight);
   }
   template <class F> void map_neighbors_early_exit(size_t i, F f) const {
     W empty_weight = W();
-    graph.map_neighbors(i,f,empty_weight);
+    graph.map_neighbors(i,f,F2<F, true, W>(f),F3<F,W>(f,i),empty_weight);
   }
   template <class F> void parallel_map_neighbors(size_t i, F f) const {
     W empty_weight = W();
-    graph.map_neighbors(i,f,empty_weight);
+    graph.map_neighbors(i,f,F2<F, true, W>(f),F3<F,W>(f,i),empty_weight);
   }
 
   template <class F>
   void parallel_map_neighbors_early_exit(size_t i, F f) const {
     W empty_weight = W();
-    graph.map_neighbors(i,f,empty_weight);
+    graph.map_neighbors(i,f,F2<F, true, W>(f),F3<F,W>(f,i),empty_weight);
   }
   TerraceWrapper() :  vertex_weights(nullptr){}
 
@@ -96,7 +112,8 @@ int main(int argc, char *argv[]) {
     if(symmetric){
       auto G = gbbs::gbbs_io::read_unweighted_symmetric_graph<graph_t>(
           iFile, mmap, binary);
-      // run_all<true>(G, options);
+      // gbbs::BFS_runner(G, 1, 5, true);
+      run_all<true>(G, options);
     }
     else{
       TerraceGraph graph(iFile,false);

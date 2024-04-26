@@ -282,6 +282,14 @@ cc_binary(
     defines = ["ASPEN_USE_COMPRESSION", "USE_INPLACE"],
 )
 
+cc_binary(
+    name = "run_terrace_srinivas",
+    srcs = ["run_terrace_srinivas.cc"],
+    deps = ["//benchmarks:run_unweighted",
+    "//gbbs:macros",
+    "@terraceSrinivas//include:terrace_graph",
+     ],
+)
 package(
     default_visibility = ["//visibility:public"],
 )

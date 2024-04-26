@@ -2208,7 +2208,7 @@ public:
     } else {
       typename Monoid::T value = reduce.identity;
       map_neighbors(
-          id, [&](auto &...args) { value = reduce.f(value, f(args...)); });
+          id, [&](auto &...args) { value = reduce(value, f(args...)); });
       return value;
     }
   }
@@ -2223,7 +2223,7 @@ public:
     } else {
       typename Monoid::T value = reduce.identity;
       map_in_neighbors(
-          id, [&](auto &...args) { value = reduce.f(value, f(args...)); });
+          id, [&](auto &...args) { value = reduce(value, f(args...)); });
       return value;
     }
   }
@@ -2238,7 +2238,7 @@ public:
     } else {
       typename Monoid::T value = reduce.identity;
       map_out_neighbors(
-          id, [&](auto &...args) { value = reduce.f(value, f(args...)); });
+          id, [&](auto &...args) { value = reduce(value, f(args...)); });
       return value;
     }
   }
